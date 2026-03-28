@@ -10,14 +10,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "") TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "") SCAN_INTERVAL = int(os.environ.get("SCAN_INTERVAL", "600"))
-
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
+SCAN_INTERVAL = int(os.environ.get("SCAN_INTERVAL", "600"))
 def send_telegram(message):
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
         logger.info("Telegram no configurado")
         return
     try:
-        url = f"https://eur04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fapi.telegram.org%2Fbot&data=05%7C02%7Cthomas.deprez%40skintechpharmagroup.com%7Cb36b45d3e5a5487def7b08de8ce54f24%7C8f364ac47bc5471f9981bae9e2ed41f0%7C0%7C0%7C639103113660639418%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=GsQldJaYm%2B2sTgXCtuMFMPcSChmfGMBbPMX4%2F11UZ4A%3D&reserved=0{TELEGRAM_TOKEN}/sendMessage"
+url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
         requests.post(url, json={
             "chat_id": TELEGRAM_CHAT_ID,
             "text": message,
@@ -28,7 +29,7 @@ def send_telegram(message):
 
 def get_markets():
     try:
-        url = "https://eur04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgamma-api.polymarket.com%2Fmarkets&data=05%7C02%7Cthomas.deprez%40skintechpharmagroup.com%7Cb36b45d3e5a5487def7b08de8ce54f24%7C8f364ac47bc5471f9981bae9e2ed41f0%7C0%7C0%7C639103113660667970%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=pSI9Xp8wnJXGD83hsmyRnBIqyvkNgqPOhFgBf8l4U%2FY%3D&reserved=0"
+url = "https://gamma-api.polymarket.com/markets"
         params = {
             "limit": 30,
             "active": "true",
