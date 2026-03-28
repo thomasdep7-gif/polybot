@@ -5,7 +5,7 @@ import json
 import logging
 from datetime import datetime
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s') logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "") TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "") MIN_EDGE = float(os.environ.get("MIN_EDGE", "0.08")) MAX_BET_FRACTION = float(os.environ.get("MAX_BET_FRACTION", "0.05")) SCAN_INTERVAL = int(os.environ.get("SCAN_INTERVAL", "600"))
 
