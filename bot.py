@@ -3,6 +3,7 @@ import time
 import requests
 import json
 import logging
+from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("polybot")
@@ -23,12 +24,23 @@ def get_markets():
     r = requests.get(url, params={"limit": 50, "active": "true", "closed": "false"}, timeout=15)
     return r.json()
 
+def days_until(date_str):
+    try:
+        end = datetime.strptime(date_str[:10], "%Y-%m-%d")
+        return (end - datetime.now()).days
+    except:
+        return 999
+
 def run():
     logger.info("Escaneando...")
     markets = get_markets()
     found = 0
     for m in markets:
         try:
+            end_date = m.get("endDate", "")
+            days = days_until(end_date)
+            if days < 1 or days > 60:
+                continue
             prices = m.get("outcomePrices", "[]")
             if isinstance(prices, str):
                 prices = json.loads(prices)
@@ -38,24 +50,17 @@ def run():
             vol = float(m.get("volume", 0))
             if vol < 5000:
                 continue
-                end_date = m.get("endDate", "")
-if not end_date:
-    continue
-from datetime import datetime
-days_left = (datetime.strptime(end_date[:10], "%Y-%m-%d") - datetime.now()).days
-if days_left > 30 or days_left < 1:
-    continue
             if 0.05 <= yes <= 0.70:
                 edge = round((yes * 1.12 - yes) * 100, 1)
                 if edge >= 4:
                     q = m.get("question", "")[:80]
                     slug = m.get("slug", "")
-                    msg = "OPORTUNIDAD YES\n" + q + "\nPrecio: " + str(round(yes*100)) + "c\nVentaja: +" + str(edge) + "%\nhttps://polymarket.com/event/" + slug
+                    msg = "OPORTUNIDAD YES\n" + q + "\nPrecio: " + str(round(yes*100)) + "c\nVentaja: +" + str(edge) + "%\nVence en: " + str(days) + " dias\nhttps://polymarket.com/event/" + slug
                     notify(msg)
                     found += 1
         except Exception as e:
             logger.error(str(e))
-    logger.info("Oportunidades encontradas: " + str(found))
+    logger.info("Oportunidades: " + str(found))
 
 notify("PolyBot activo.")
 
