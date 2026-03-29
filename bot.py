@@ -1,6 +1,7 @@
 import os
 import time
 import requests
+import json
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -13,21 +14,14 @@ INTERVAL = int(os.environ.get("SCAN_INTERVAL", "600"))
 def notify(msg):
     if not TOKEN or not CHAT:
         return
-    try:
-     url = "https://api.telegram.org/bot" + TOKEN + "/sendMessage"
-       requests.post(url, ...)
-      logger.info("Telegram enviado OK")
-   except Exception as err:
-        logger.error("Telegram error: " + str(err))
+    url = "https://api.telegram.org/bot" + TOKEN + "/sendMessage"
+    r = requests.post(url, data={"chat_id": CHAT, "text": msg}, timeout=10)
+    logger.info("Telegram: " + str(r.status_code))
 
 def get_markets():
-    try:
-        url = "https://gamma-api.polymarket.com/markets"
-        r = requests.get(url, params={"limit": 50, "active": "true", "closed": "false"}, timeout=15)
-        return r.json()
-    except Exception as err:
-        logger.error(str(err))
-        return []
+    url = "https://gamma-api.polymarket.com/markets"
+    r = requests.get(url, params={"limit": 50, "active": "true", "closed": "false"}, timeout=15)
+    return r.json()
 
 def run():
     logger.info("Escaneando...")
@@ -37,7 +31,6 @@ def run():
         try:
             prices = m.get("outcomePrices", "[]")
             if isinstance(prices, str):
-                import json
                 prices = json.loads(prices)
             if len(prices) < 2:
                 continue
@@ -53,16 +46,15 @@ def run():
                     msg = "OPORTUNIDAD YES\n" + q + "\nPrecio: " + str(round(yes*100)) + "c\nVentaja: +" + str(edge) + "%\nhttps://polymarket.com/event/" + slug
                     notify(msg)
                     found += 1
-        except Exception:
-            continue
-    if found == 0:
-        logger.info("Sin oportunidades.")
+        except Exception as e:
+            logger.error(str(e))
+    logger.info("Oportunidades encontradas: " + str(found))
 
-notify("PolyBot activo. Escaneando cada 10 minutos.")
+notify("PolyBot activo.")
 
 while True:
     try:
         run()
-    except Exception as err:
-        logger.error(str(err))
+    except Exception as e:
+        logger.error(str(e))
     time.sleep(INTERVAL)
