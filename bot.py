@@ -22,7 +22,7 @@ def notify(msg):
 def get_markets():
     try:
         url = "https://gamma-api.polymarket.com/markets"
-        r = requests.get(url, params={"limit": 20, "active": "true", "closed": "false"}, timeout=15)
+        r = requests.get(url, params={"limit": 50, "active": "true", "closed": "false"}, timeout=15)
         return r.json()
     except Exception as err:
         logger.error(str(err))
@@ -42,11 +42,11 @@ def run():
                 continue
             yes = float(prices[0])
             vol = float(m.get("volume", 0))
-            if vol < 10000:
+            if vol < 5000:
                 continue
-            if 0.10 <= yes <= 0.40:
+            if 0.05 <= yes <= 0.70:
                 edge = round((yes * 1.12 - yes) * 100, 1)
-                if edge >= 8:
+                if edge >= 4:
                     q = m.get("question", "")[:80]
                     slug = m.get("slug", "")
                     msg = "OPORTUNIDAD YES\n" + q + "\nPrecio: " + str(round(yes*100)) + "c\nVentaja: +" + str(edge) + "%\nhttps://polymarket.com/event/" + slug
