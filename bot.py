@@ -12,6 +12,8 @@ TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
 CHAT = os.environ.get("TELEGRAM_CHAT_ID", "")
 INTERVAL = int(os.environ.get("SCAN_INTERVAL", "600"))
 
+already_sent = set()
+
 def notify(msg):
     if not TOKEN or not CHAT:
         return
@@ -53,14 +55,17 @@ def run():
             if 0.05 <= yes <= 0.70:
                 edge = round((yes * 1.12 - yes) * 100, 1)
                 if edge >= 4:
-                    q = m.get("question", "")[:80]
                     slug = m.get("slug", "")
+                    if slug in already_sent:
+                        continue
+                    q = m.get("question", "")[:80]
                     msg = "OPORTUNIDAD YES\n" + q + "\nPrecio: " + str(round(yes*100)) + "c\nVentaja: +" + str(edge) + "%\nVence en: " + str(days) + " dias\nhttps://polymarket.com/event/" + slug
                     notify(msg)
+                    already_sent.add(slug)
                     found += 1
         except Exception as e:
             logger.error(str(e))
-    logger.info("Oportunidades: " + str(found))
+    logger.info("Oportunidades nuevas: " + str(found))
 
 notify("PolyBot activo.")
 
