@@ -13,10 +13,11 @@ INTERVAL = int(os.environ.get("SCAN_INTERVAL", "600"))
 def notify(msg):
     if not TOKEN or not CHAT:
         return
-    url = "https://api.telegram.org/bot" + TOKEN + "/sendMessage"
-            requests.post(url, data={"chat_id": CHAT, "text": msg}, timeout=10)
-        logger.info("Telegram enviado OK")
-    except Exception as err:
+    try:
+     url = "https://api.telegram.org/bot" + TOKEN + "/sendMessage"
+       requests.post(url, ...)
+      logger.info("Telegram enviado OK")
+   except Exception as err:
         logger.error("Telegram error: " + str(err))
 
 def get_markets():
