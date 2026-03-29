@@ -38,6 +38,13 @@ def run():
             vol = float(m.get("volume", 0))
             if vol < 5000:
                 continue
+                end_date = m.get("endDate", "")
+if not end_date:
+    continue
+from datetime import datetime
+days_left = (datetime.strptime(end_date[:10], "%Y-%m-%d") - datetime.now()).days
+if days_left > 30 or days_left < 1:
+    continue
             if 0.05 <= yes <= 0.70:
                 edge = round((yes * 1.12 - yes) * 100, 1)
                 if edge >= 4:
