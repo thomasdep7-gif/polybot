@@ -14,10 +14,10 @@ def notify(msg):
     if not TOKEN or not CHAT:
         return
     url = "https://api.telegram.org/bot" + TOKEN + "/sendMessage"
-    try:
-        requests.post(url, data={"chat_id": CHAT, "text": msg}, timeout=10)
+            requests.post(url, data={"chat_id": CHAT, "text": msg}, timeout=10)
+        logger.info("Telegram enviado OK")
     except Exception as err:
-        logger.error(str(err))
+        logger.error("Telegram error: " + str(err))
 
 def get_markets():
     try:
